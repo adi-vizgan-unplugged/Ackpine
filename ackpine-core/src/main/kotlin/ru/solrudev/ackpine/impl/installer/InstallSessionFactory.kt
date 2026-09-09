@@ -140,6 +140,7 @@ internal class InstallSessionFactoryImpl internal constructor(
 						packageInstallerService.value.bind(id)
 					},
 					apks = parameters.apks.toList(),
+					v4Signatures = parameters.v4Signatures,
 					id,
 					initialState = Session.State.Pending,
 					initialProgress = Progress(),
@@ -269,6 +270,7 @@ internal class InstallSessionFactoryImpl internal constructor(
 				applicationContext,
 				boundPackageInstallerService,
 				apks = installSession.getApks(),
+				v4Signatures = installSession.getV4Signatures(),
 				sessionId,
 				initialState, initialProgress,
 				installSession.session.confirmation, installSession.getNotificationData(),
