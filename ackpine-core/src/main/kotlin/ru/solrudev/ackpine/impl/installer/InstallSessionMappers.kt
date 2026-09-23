@@ -44,10 +44,7 @@ internal fun SessionEntity.InstallSession.getApks(): List<Uri> {
 @JvmSynthetic
 internal fun SessionEntity.InstallSession.getV4Signatures(): Map<Uri, Uri> {
 	return uris
-		.mapNotNull { entity ->
-			val v4SignatureUri = entity.v4SignatureUri ?: return@mapNotNull null
-			entity.uri.toUri() to v4SignatureUri.toUri()
-		}
+		.mapNotNull { entity -> entity.v4SignatureUri?.let { entity.uri.toUri() to it.toUri() } }
 		.toMap()
 }
 

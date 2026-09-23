@@ -29,6 +29,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+private const val BASE_APK = "file:///base.apk"
+private const val BASE_APK_V4_SIGNATURE = "file:///base.apk.idsig"
+private const val SPLIT_1_APK = "file:///split1.apk"
+private const val SPLIT_2_APK = "file:///split2.apk"
+private const val SPLIT_2_APK_V4_SIGNATURE = "file:///split2.apk.idsig"
+
 @RunWith(RobolectricTestRunner::class)
 class InstallSessionDaoTest : HasAckpineDatabaseTest() {
 
@@ -40,13 +46,13 @@ class InstallSessionDaoTest : HasAckpineDatabaseTest() {
 				id = id,
 				state = SessionEntity.State.PENDING,
 				installerType = InstallerType.SESSION_BASED,
-				uris = listOf("file:///base.apk")
+				uris = listOf(BASE_APK)
 			)
 		)
 
 		val restored = assertNotNull(database.installSessionDao().getInstallSession(id))
 
-		assertEquals(listOf("file:///base.apk"), restored.uris.map { it.uri })
+		assertEquals(listOf(BASE_APK), restored.uris.map { it.uri })
 		assertEquals(listOf(null), restored.uris.map { it.v4SignatureUri })
 		assertEquals(emptyMap(), restored.getV4Signatures())
 	}
@@ -59,10 +65,10 @@ class InstallSessionDaoTest : HasAckpineDatabaseTest() {
 				id = id,
 				state = SessionEntity.State.PENDING,
 				installerType = InstallerType.SESSION_BASED,
-				uris = listOf("file:///base.apk", "file:///split1.apk", "file:///split2.apk"),
+				uris = listOf(BASE_APK, SPLIT_1_APK, SPLIT_2_APK),
 				v4SignatureUris = mapOf(
-					"file:///base.apk" to "file:///base.apk.idsig",
-					"file:///split2.apk" to "file:///split2.apk.idsig"
+					BASE_APK to BASE_APK_V4_SIGNATURE,
+					SPLIT_2_APK to SPLIT_2_APK_V4_SIGNATURE
 				)
 			)
 		)
@@ -72,9 +78,9 @@ class InstallSessionDaoTest : HasAckpineDatabaseTest() {
 		// The pairing is row-local, so it survives regardless of the order rows come back in.
 		assertEquals(
 			mapOf(
-				"file:///base.apk" to "file:///base.apk.idsig",
-				"file:///split1.apk" to null,
-				"file:///split2.apk" to "file:///split2.apk.idsig"
+				BASE_APK to BASE_APK_V4_SIGNATURE,
+				SPLIT_1_APK to null,
+				SPLIT_2_APK to SPLIT_2_APK_V4_SIGNATURE
 			),
 			restored.uris.associate { it.uri to it.v4SignatureUri }
 		)
